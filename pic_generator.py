@@ -60,6 +60,35 @@ def generate_image(prompt: str, output_path: str | None = None) -> str:
     return output_path
 
 
+def batch_generate(prompt_file: str) -> list[str]:
+    """Read prompts from a file (one per line) and generate images for each."""
+    text = Path(prompt_file).read_text(encoding="utf-8")
+    prompts = [line.strip() for line in text.splitlines() if line.strip()]
+
+    if not prompts:
+        print("No valid prompts found in the file.")
+        return []
+
+    print(f"Found {len(prompts)} prompts, starting batch generation...")
+    results = []
+    for i, prompt in enumerate(prompts, 1):
+        print(f"\n[{i}/{len(prompts)}]")
+        try:
+            path = generate_image(prompt)
+            results.append(path)
+        except Exception as e:
+            print(f"Failed: {e}")
+
+    print(f"\nDone. {len(results)}/{len(prompts)} images generated.")
+    return results
+
+
 if __name__ == "__main__":
-    prompt = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "生成一张猫的图"
-    generate_image(prompt)
+    if len(sys.argv) > 1:
+        arg = sys.argv[1]
+        if Path(arg).is_file():
+            batch_generate(arg)
+        else:
+            generate_image(" ".join(sys.argv[1:]))
+    else:
+        generate_image("生成一张猫的图")
