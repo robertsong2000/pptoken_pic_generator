@@ -263,6 +263,7 @@ def main():
         try:
             generate_image(prompt, output_path)
             success += 1
+            time.sleep(5)
         except Exception as e:
             print(f"  FAILED: {e}")
             failed += 1
